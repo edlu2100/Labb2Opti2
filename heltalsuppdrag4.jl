@@ -81,8 +81,8 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Variables
-# (5) x[i] ∈ {0,1}: om mast i byggs
-# (6) y[i,j] ∈ {0,1}: om växelstation j kopplas till mast i
+# om mast i byggs
+# om växelstation j kopplas till mast i
 #----------------------------------------------------------------
 @variable( mod, x[M], Bin )
 @variable( mod, y[M, S], Bin )
@@ -91,7 +91,6 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Objective
-# min  Σ_{i∈M} f_i·x_i  +  Σ_{i∈M} Σ_{j∈S} c_ij·y_ij
 #----------------------------------------------------------------
 @objective( mod, Min,
     sum( f[i] * x[i] for i in M )
@@ -104,22 +103,22 @@ mod = Model(HiGHS.Optimizer)
 # Constraints
 #----------------------------------------------------------------
 
-# (1) Varje växelstation j kopplas till minst en mast
+# Varje växelstation j kopplas till minst en mast
 @constraint( mod, c1[j in S],
     sum( y[i,j] for i in M ) >= 1
 )
 
-# (2) Mast i kan bara ta emot kopplingar om den byggs, och då högst K stationer
+# Mast i kan bara ta emot kopplingar om den byggs, och då högst K stationer
 @constraint( mod, c2[i in M],
     sum( y[i,j] for j in S ) <= K * x[i]
 )
 
-# (3) Varje strategisk punkt täcks av minst en byggd mast
+# Varje strategisk punkt täcks av minst en byggd mast
 @constraint( mod, c3[p in P],
     sum( x[i] for i in N[p] ) >= 1
 )
 
-# (4) Förbjudna mastpar – inte båda byggs
+# Förbjudna mastpar – inte båda byggs
 @constraint( mod, c4[(i1,i2) in I],
     x[i1] + x[i2] <= 1
 )

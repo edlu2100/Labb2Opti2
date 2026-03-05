@@ -79,9 +79,9 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Variables
-# y_i  ∈ {0,1}     : om lager i öppnas
-# x_ij ≥ 0, heltal : flöde från lager i till detaljist j
-# z_ij ∈ {0,1}     : om detaljist j betjänas av lager i
+# om lager i öppnas
+# flöde från lager i till detaljist j
+# om detaljist j betjänas av lager i
 #----------------------------------------------------------------
 @variable( mod, y[L], Bin )
 @variable( mod, x[KOMB] >= 0, Int )
@@ -91,9 +91,6 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Objective
-# min  Σ_{i∈I} f_i·y_i
-#    + Σ_{(i,j)∈KOMB} c_ij·x_ij
-#    + Σ_{(i,j)∈KOMB} k_i·z_ij
 #----------------------------------------------------------------
 @objective( mod, Min,
     sum( fast[i]  * y[i]       for i in L )
@@ -107,22 +104,22 @@ mod = Model(HiGHS.Optimizer)
 # Constraints
 #----------------------------------------------------------------
 
-# (1) Efterfrågan uppfylls: Σ_{i:(i,j)∈KOMB} x_ij = d_j  ∀j∈J
+# Efterfrågan uppfylls
 @constraint( mod, c1[j in D],
     sum( x[(i,j)] for i in L if (i,j) in KOMB ) == demand[j]
 )
 
-# (2) Lagerkapacitet: Σ_{j:(i,j)∈KOMB} x_ij ≤ s_i·y_i  ∀i∈I
+# Lagerkapacitet
 @constraint( mod, c2[i in L],
     sum( x[(i,j)] for j in D if (i,j) in KOMB ) <= supply[i] * y[i]
 )
 
-# (3) Koppling flöde–betjäning: x_ij ≤ d_j·z_ij  ∀(i,j)∈KOMB
+# Koppling flöde–betjäning
 @constraint( mod, c3[(i,j) in KOMB],
     x[(i,j)] <= demand[j] * z[(i,j)]
 )
 
-# (4) Max antal detaljister per lager: Σ_{j:(i,j)∈KOMB} z_ij ≤ ·y_i  ∀i∈I
+# Max antal detaljister per lager
 @constraint( mod, c4[i in L],
     sum( z[(i,j)] for j in D if (i,j) in KOMB ) <= K * y[i]
 )
