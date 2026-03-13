@@ -81,10 +81,10 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Variables
-# om mast i byggs
-# om växelstation j kopplas till mast i
 #----------------------------------------------------------------
+# om mast i byggs
 @variable( mod, x[M], Bin )
+# om växelstation j kopplas till mast i
 @variable( mod, y[M, S], Bin )
 #----------------------------------------------------------------
 

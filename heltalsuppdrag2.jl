@@ -79,12 +79,12 @@ mod = Model(HiGHS.Optimizer)
 
 #----------------------------------------------------------------
 # Variables
-# om lager i öppnas
-# flöde från lager i till detaljist j
-# om detaljist j betjänas av lager i
 #----------------------------------------------------------------
+# om lager i öppnas
 @variable( mod, y[L], Bin )
+# flöde från lager i till detaljist j
 @variable( mod, x[KOMB] >= 0, Int )
+# om detaljist j betjänas av lager i
 @variable( mod, z[KOMB], Bin )
 #----------------------------------------------------------------
 
